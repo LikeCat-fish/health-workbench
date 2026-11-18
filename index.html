@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#14352d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="健康工作台">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="个人健康记录与提示工作台">
+  <title>健康工作台</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div class="app">
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="22" height="22">
+              <rect width="32" height="32" rx="8" fill="currentColor"/>
+              <path d="M8 17.2c0-3.1 2.2-5.2 4.8-5.2 1.4 0 2.5.6 3.2 1.6.7-1 1.8-1.6 3.2-1.6 2.6 0 4.8 2.1 4.8 5.2 0 4.4-5.2 7.6-8 9.2-2.8-1.6-8-4.8-8-9.2z" fill="#dceee8"/>
+            </svg>
+          </span>
+          <h1 class="brand-title">健康工作台</h1>
+        </div>
+        <nav class="top-nav" aria-label="主要导航">
+          <a href="#dashboard" data-route="dashboard">仪表盘</a>
+          <a href="#record" data-route="record">记录</a>
+          <a href="#library" data-route="library">知识库</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="view-dashboard" class="view" hidden>
+        <h2 class="page-title">仪表盘</h2>
+
+        <div class="layout-dashboard">
+        <article class="card card-overview" aria-labelledby="overview-title">
+          <h3 id="overview-title" class="card-title">今日概览</h3>
+          <p class="card-date" id="today-date"></p>
+          <div id="today-overview" class="overview-grid"></div>
+        </article>
+
+        <article class="card card-trend" aria-labelledby="trend-title">
+          <div class="card-head">
+            <h3 id="trend-title" class="card-title">趋势</h3>
+            <label class="inline-field">
+              <span class="sr-only">选择记录类型</span>
+              <select id="trend-type"></select>
+            </label>
+          </div>
+          <div id="trend-chart" class="chart-wrap" role="img" aria-label="近期数值趋势图"></div>
+          <p id="trend-caption" class="muted hint"></p>
+        </article>
+
+        <article class="card card-recent" aria-labelledby="recent-title">
+          <h3 id="recent-title" class="card-title">最近记录</h3>
+          <div id="recent-list" class="record-list"></div>
+        </article>
+
+        <article class="card card-backup" aria-labelledby="backup-title">
+          <h3 id="backup-title" class="card-title">备份与恢复</h3>
+          <p class="note">数据只保存在这台设备的浏览器里。换设备或清理浏览器前，请先生成备份文本并自行保存。</p>
+          <div class="button-row">
+            <button type="button" id="btn-backup" class="btn btn-primary">生成备份文本</button>
+            <button type="button" id="btn-copy" class="btn btn-ghost">复制</button>
+            <button type="button" id="btn-restore" class="btn btn-secondary">从文本恢复</button>
+          </div>
+          <label class="field">
+            <span class="sr-only">备份文本</span>
+            <textarea id="backup-text" rows="8" spellcheck="false" placeholder="点击「生成备份文本」后，内容会显示在这里。恢复时请粘贴此前保存的备份文本。"></textarea>
+          </label>
+        </article>
+        </div>
+      </section>
+
+      <section id="view-record" class="view" hidden>
+        <h2 class="page-title">记录</h2>
+        <article class="card" aria-labelledby="quick-record-title">
+          <h3 id="quick-record-title" class="card-title">快速记录</h3>
+          <form id="record-form" class="record-form-layout" novalidate>
+            <div class="field-grid">
+              <label class="field field-wide">
+                <span>记录什么</span>
+                <select id="record-type" required></select>
+              </label>
+              <label class="field field-wide" id="custom-type-wrap" hidden>
+                <span>自定义名称</span>
+                <input id="record-custom-type" type="text" maxlength="40" placeholder="例如：体温" autocomplete="off">
+              </label>
+              <label class="field">
+                <span>数值</span>
+                <input id="record-value" type="text" inputmode="decimal" maxlength="32" placeholder="例如：65.5" autocomplete="off">
+              </label>
+              <label class="field">
+                <span>单位</span>
+                <input id="record-unit" type="text" maxlength="16" placeholder="例如：kg" autocomplete="off">
+              </label>
+              <label class="field field-wide">
+                <span>时间</span>
+                <input id="record-time" type="datetime-local" required>
+              </label>
+            </div>
+            <div class="record-form-extra">
+              <label class="field field-wide">
+                <span>备注（选填）</span>
+                <textarea id="record-note" rows="3" maxlength="500" placeholder="可选，补充当时的情况或感受"></textarea>
+              </label>
+              <div class="button-row button-row-form">
+                <button type="submit" class="btn btn-primary">保存记录</button>
+                <button type="reset" class="btn btn-ghost">清空</button>
+              </div>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="view-library" class="view" hidden>
+        <h2 class="page-title">知识库</h2>
+        <div class="layout-library">
+        <article class="card card-library-form" aria-labelledby="add-content-title">
+          <h3 id="add-content-title" class="card-title">添加内容</h3>
+          <form id="library-form" novalidate>
+            <div class="field-grid">
+              <label class="field field-wide">
+                <span>标题</span>
+                <input id="library-title" type="text" maxlength="120" required placeholder="例如：高血压饮食建议" autocomplete="off">
+              </label>
+              <label class="field field-wide">
+                <span>链接</span>
+                <input id="library-url" type="url" maxlength="2000" required placeholder="https://" autocomplete="off">
+              </label>
+              <label class="field field-wide">
+                <span>备注或标签（选填）</span>
+                <input id="library-note" type="text" maxlength="200" placeholder="备注，或多个标签用逗号分隔" autocomplete="off">
+              </label>
+            </div>
+            <div class="button-row button-row-form">
+              <button type="submit" class="btn btn-primary">添加</button>
+            </div>
+          </form>
+          <p class="note">说明：资讯需要手动添加链接，暂不支持自动订阅更新。</p>
+        </article>
+
+        <article class="card card-library-list" aria-labelledby="library-list-title">
+          <h3 id="library-list-title" class="card-title">已保存内容</h3>
+          <div id="library-list" class="library-list"></div>
+        </article>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>仅作个人记录与提示，不构成医疗建议；数值异常请咨询医生。</p>
+      </footer>
+    </main>
+
+    <nav class="tab-bar" aria-label="主要导航">
+      <a href="#dashboard" data-route="dashboard">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/>
+          <rect x="13.5" y="3.5" width="7" height="4.5" rx="1.6"/>
+          <rect x="13.5" y="10.5" width="7" height="10" rx="1.6"/>
+          <rect x="3.5" y="13" width="7" height="7.5" rx="1.6"/>
+        </svg>
+        <span>仪表盘</span>
+      </a>
+      <a href="#record" data-route="record">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8.25"/>
+          <path d="M12 8.2v7.6M8.2 12h7.6"/>
+        </svg>
+        <span>记录</span>
+      </a>
+      <a href="#library" data-route="library">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 5.2h10.2a2 2 0 0 1 2 2V19H7.6A1.6 1.6 0 0 1 6 17.4V5.2z"/>
+          <path d="M6 17.4A1.6 1.6 0 0 1 7.6 19"/>
+          <path d="M9 8.7h7.2M9 12.2h5.2"/>
+        </svg>
+        <span>知识库</span>
+      </a>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
